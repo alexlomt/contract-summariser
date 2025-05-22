@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.51.0",
+    "@cyber2024/pdf-parse-fixed": "^1.2.5",
     "@types/marked": "^5.0.2",
     "canvas": "^3.1.0",
     "encoding": "^0.1.13",
@@ -18,7 +19,6 @@
     "html-to-docx": "^1.8.0",
     "marked": "^15.0.12",
     "next": "15.3.2",
-    "pdf-parse": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -27,7 +27,6 @@
     "@tailwindcss/postcss": "^4",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^20.17.50",
-    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
