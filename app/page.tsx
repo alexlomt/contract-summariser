@@ -14,15 +14,12 @@ export default function Home() {
       <div className="w-full max-w-4xl text-center mb-12 relative z-10">
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-white">
           <span className="block">
-            AI Contract
-          </span>
-          <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
-            Summarizer
+            Klesch Contract Analyser
           </span>
         </h1>
         
         <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          Transform complex legal documents into clear, actionable insights with our advanced AI technology. 
+          Select a PDF document you would like to analyse, and click "Generate Summary". Please note this is an initial test version. For any issues and to report any errors please contact Alex from the M&A team. 
           <span className="font-semibold text-blue-400"> Secure, fast, and intelligent.</span>
         </p>
       </div>
