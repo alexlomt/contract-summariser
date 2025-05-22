@@ -18,9 +18,8 @@ export default function Home() {
           </span>
         </h1>
         
-        <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
           Select a PDF document you would like to analyse, and click "Generate Summary". Please note this is an initial test version. For any issues and to report any errors please contact Alex from the M&A team. 
-          <span className="font-semibold text-blue-400"> Secure, fast, and intelligent.</span>
         </p>
       </div>
 
