@@ -1,92 +1,12 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { URL as NodeURL } from 'url';
-
-// Simple polyfills with required properties for PDF.js
-if (typeof global !== 'undefined') {
-  if (!global.DOMMatrix) {
-    global.DOMMatrix = class {
-      a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
-      m11 = 1; m12 = 0; m13 = 0; m14 = 0;
-      m21 = 0; m22 = 1; m23 = 0; m24 = 0;
-      m31 = 0; m32 = 0; m33 = 1; m34 = 0;
-      m41 = 0; m42 = 0; m43 = 0; m44 = 1;
-      is2D = true; isIdentity = true;
-      
-      constructor() {}
-      translateSelf() { return this; }
-      scaleSelf() { return this; }
-      rotateSelf() { return this; }
-      skewXSelf() { return this; }
-      skewYSelf() { return this; }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any; // Suppress TypeScript error for polyfill
-  }
-  
-  if (!global.DOMPoint) {
-    global.DOMPoint = class {
-      x = 0; y = 0; z = 0; w = 1;
-      constructor() {
-        this.x = 0; this.y = 0; this.z = 0; this.w = 1;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any; // Suppress TypeScript error for polyfill
-  }
-  
-  if (!global.URL) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    global.URL = NodeURL as any; // Suppress TS error for now
-  }
-}
-
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
-
-// Define a simple interface for TextItem as it's not directly exported
-interface PdfTextItem {
-  str: string;
-  // Add other properties if needed, e.g., dir, width, height, transform, fontName
-}
-
-// Completely disable worker for Node.js environment
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-GlobalWorkerOptions.workerSrc = null as any; // Tell pdfjs-dist not to load a worker (alternative)
-// GlobalWorkerOptions.workerPort = null; // Ensure worker port is null
+import pdf from 'pdf-parse';
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
   try {
-    const typedArray = new Uint8Array(fileBuffer);
-    
-    // Configure getDocument with all worker-disabling options
-    const loadingTask = getDocument({
-      data: typedArray,
-      useWorkerFetch: false,
-      isEvalSupported: false,
-      useSystemFonts: true,
-      disableAutoFetch: true,
-      disableStream: true,
-      disableRange: true,
-      worker: undefined, // Explicitly set worker to undefined
-    });
-    
-    const pdfDocument = await loadingTask.promise;
-    let fullText = '';
-    
-    for (let i = 1; i <= pdfDocument.numPages; i++) {
-      const page = await pdfDocument.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item) => (item as PdfTextItem).str).join(' ');
-      fullText = fullText + pageText + '\n';
-      
-      // Clean up page resources
-      try {
-        page.cleanup();
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (cleanupError) {
-        // Ignore cleanup errors
-      }
-    }
-    
-    return fullText;
+    const buffer = Buffer.from(fileBuffer);
+    const data = await pdf(buffer);
+    return data.text;
   } catch (error) {
     console.error("PDF extraction error:", error);
     throw error;
@@ -203,8 +123,8 @@ ${trimmedContent}
     let errorMessage = 'An unexpected error occurred.';
     
     if (errorUnknown instanceof Anthropic.APIError) {
-      errorMessage = `Anthropic API Error: ${errorUnknown.message}`; // Direct access after instanceof check
-    } else if (error.message) { // error here is already asserted as Error
+      errorMessage = `Anthropic API Error: ${errorUnknown.message}`;
+    } else if (error.message) {
       errorMessage = error.message;
     }
     
