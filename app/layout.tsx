@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Contract Summarizer - Intelligent Legal Document Analysis",
-  description: "Transform complex legal documents into clear, actionable insights with our advanced AI technology. Secure, fast, and intelligent contract analysis.",
+  title: "Klesch AI Contract Analyser",
+  description: "Secure, fast, and intelligent contract analysis.",
   keywords: "AI, contract analysis, legal documents, document summarization, legal tech",
   authors: [{ name: "AI Contract Summarizer Team" }],
   viewport: "width=device-width, initial-scale=1",
