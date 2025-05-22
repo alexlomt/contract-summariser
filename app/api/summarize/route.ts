@@ -47,9 +47,9 @@ interface PdfTextItem {
   // Add other properties if needed, e.g., dir, width, height, transform, fontName
 }
 
-// Point to the worker script in node_modules for Node.js environment
-GlobalWorkerOptions.workerSrc = `pdfjs-dist/legacy/build/pdf.worker.js`;
-// GlobalWorkerOptions.workerPort = null; // This might not be needed if workerSrc is set correctly
+// Completely disable worker for Node.js environment
+GlobalWorkerOptions.workerSrc = false as any; // Tell pdfjs-dist not to load a worker
+// GlobalWorkerOptions.workerPort = null; // Ensure worker port is null
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
   try {
@@ -58,13 +58,13 @@ async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
     // Configure getDocument with all worker-disabling options
     const loadingTask = getDocument({
       data: typedArray,
-      // useWorkerFetch: false, // Not needed if workerSrc is correct
-      // isEvalSupported: false, // Not needed if workerSrc is correct
+      useWorkerFetch: false,
+      isEvalSupported: false,
       useSystemFonts: true,
-      // disableAutoFetch: true, // Not needed if workerSrc is correct
-      // disableStream: true, // Not needed if workerSrc is correct
-      // disableRange: true, // Not needed if workerSrc is correct
-      // worker: undefined, // Not needed if workerSrc is correct
+      disableAutoFetch: true,
+      disableStream: true,
+      disableRange: true,
+      worker: undefined, // Explicitly set worker to undefined
     });
     
     const pdfDocument = await loadingTask.promise;
