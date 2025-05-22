@@ -11,7 +11,7 @@ export default function Home() {
       </div>
 
       {/* Header Section */}
-      <div className="w-full max-w-4xl text-center mb-12 relative z-10">
+      <div className="w-full max-w-2xl text-center mb-12 relative z-10">
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-white">
           <span className="block">
             Klesch Contract Analyser
