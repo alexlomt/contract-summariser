@@ -11,15 +11,19 @@ export default function Home() {
       </div>
 
       {/* Header Section */}
-      <div className="w-full max-w-4xl text-center mb-6 relative z-10">
+      <div className="w-full max-w-4xl text-center mb-12 relative z-10">
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-white">
           <span className="block">
-            Klesch Contract Summariser
+            AI Contract
+          </span>
+          <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+            Summarizer
           </span>
         </h1>
         
         <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-          Select a PDF document you would like summarised with AI and click "Generate Summary"
+          Transform complex legal documents into clear, actionable insights with our advanced AI technology. 
+          <span className="font-semibold text-blue-400"> Secure, fast, and intelligent.</span>
         </p>
       </div>
 
