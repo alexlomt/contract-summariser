@@ -37,14 +37,22 @@ if (typeof global !== 'undefined') {
 
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
 
-if (typeof process !== 'undefined' && process.versions?.node) {
-  GlobalWorkerOptions.workerSrc = 'pdfjs-dist/legacy/build/pdf.worker.js';
-}
+// DISABLE worker for server-side processing
+GlobalWorkerOptions.workerSrc = '';
+GlobalWorkerOptions.workerPort = null;
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
   try {
     const typedArray = new Uint8Array(fileBuffer);
-    const loadingTask = getDocument({ data: typedArray });
+    
+    // Configure getDocument to not use worker
+    const loadingTask = getDocument({
+      data: typedArray,
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      useSystemFonts: true,
+    });
+    
     const pdfDocument = await loadingTask.promise;
     let fullText = '';
     
