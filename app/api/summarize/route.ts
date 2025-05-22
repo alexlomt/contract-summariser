@@ -19,16 +19,19 @@ if (typeof global !== 'undefined') {
       rotateSelf() { return this; }
       skewXSelf() { return this; }
       skewYSelf() { return this; }
-    };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any; // Suppress TypeScript error for polyfill
   }
   
   if (!global.DOMPoint) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     global.DOMPoint = class {
       x = 0; y = 0; z = 0; w = 1;
       constructor() {
         this.x = 0; this.y = 0; this.z = 0; this.w = 1;
       }
-    };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any; // Suppress TypeScript error for polyfill
   }
   
   if (!global.URL) {
