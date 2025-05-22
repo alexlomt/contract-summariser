@@ -1,5 +1,5 @@
 // scripts/start-dev.js
-const { spawn } = require('child_process');
+import { spawn } from 'child_process';
 
 const nextCommandArgs = ['dev'];
 
@@ -19,7 +19,7 @@ nextCommandArgs.push('-H', '0.0.0.0');
 
 console.log(`Executing: npx next ${nextCommandArgs.join(' ')}`);
 
-const child = spawn('npx', ['next', ...nextCommandArgs], { stdio: 'inherit' });
+const child = spawn('npx', ['next', ...nextCommandArgs], { stdio: 'inherit', shell: true });
 
 child.on('error', (error) => {
   console.error(`Failed to start Next.js subprocess: ${error}`);

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -13,10 +13,14 @@ export const metadata: Metadata = {
   description: "Secure, fast, and intelligent contract analysis.",
   keywords: "AI, contract analysis, legal documents, document summarization, legal tech",
   authors: [{ name: "AI Contract Summarizer Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#3b82f6" },
-    { media: "(prefers-color-scheme: dark)", color: "#60a5fa" }
+    { media: "(prefers-color-scheme: dark)", color: "#60a5fa" },
   ],
 };
 

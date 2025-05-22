@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { URL as NodeURL } from 'url';
 
 // Simple polyfills with required properties for PDF.js
 if (typeof global !== 'undefined') {
@@ -31,15 +32,15 @@ if (typeof global !== 'undefined') {
   }
   
   if (!global.URL) {
-    global.URL = require('url').URL;
+    global.URL = NodeURL as any; // Suppress TS error for now
   }
 }
 
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
 
-// Completely disable worker
-GlobalWorkerOptions.workerSrc = false as any;
-GlobalWorkerOptions.workerPort = null;
+// Point to the worker script in node_modules for Node.js environment
+GlobalWorkerOptions.workerSrc = `pdfjs-dist/legacy/build/pdf.worker.js`;
+// GlobalWorkerOptions.workerPort = null; // This might not be needed if workerSrc is set correctly
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
   try {
@@ -48,14 +49,13 @@ async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
     // Configure getDocument with all worker-disabling options
     const loadingTask = getDocument({
       data: typedArray,
-      useWorkerFetch: false,
-      isEvalSupported: false,
+      // useWorkerFetch: false, // Not needed if workerSrc is correct
+      // isEvalSupported: false, // Not needed if workerSrc is correct
       useSystemFonts: true,
-      disableAutoFetch: true,
-      disableStream: true,
-      disableRange: true,
-      // Force disable worker
-      worker: null,
+      // disableAutoFetch: true, // Not needed if workerSrc is correct
+      // disableStream: true, // Not needed if workerSrc is correct
+      // disableRange: true, // Not needed if workerSrc is correct
+      // worker: undefined, // Not needed if workerSrc is correct
     });
     
     const pdfDocument = await loadingTask.promise;
@@ -164,11 +164,6 @@ export async function POST(request: Request) {
 - List each appendix/attachment with brief description
 - Note if content is (redacted) or (not included in contract)
 - Highlight any critical supplementary documents
-
-## **Key Recommendations**
-- Critical points requiring attention
-- Potential negotiation opportunities
-- Risk mitigation suggestions
 
 Ensure all sections are clearly formatted with bold headings, bullet points for readability, and proper markdown syntax. Be thorough but concise, focusing on actionable insights and critical information.`;
     
