@@ -1,50 +1,75 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
-// Complete polyfills that PDF.js needs
-if (typeof global !== 'undefined') {
-  if (!global.DOMMatrix) {
-    global.DOMMatrix = class {
-      a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
-      m11 = 1; m12 = 0; m13 = 0; m14 = 0;
-      m21 = 0; m22 = 1; m23 = 0; m24 = 0;
-      m31 = 0; m32 = 0; m33 = 1; m34 = 0;
-      m41 = 0; m42 = 0; m43 = 0; m44 = 1;
-      is2D = true; isIdentity = true;
-      
-      constructor() {}
-      translateSelf() { return this; }
-      scaleSelf() { return this; }
-      rotateSelf() { return this; }
-      skewXSelf() { return this; }
-      skewYSelf() { return this; }
-    };
-  }
+// Initialize polyfills more safely
+function initializePolyfills() {
+  if (typeof global === 'undefined') return;
   
-  if (!global.DOMPoint) {
-    global.DOMPoint = class {
-      x = 0; y = 0; z = 0; w = 1;
-      constructor(x?: number, y?: number, z?: number, w?: number) {
-        if (x !== undefined) this.x = x;
-        if (y !== undefined) this.y = y;
-        if (z !== undefined) this.z = z;
-        if (w !== undefined) this.w = w;
-      }
-    };
-  }
-  
-  if (!global.URL) {
-    global.URL = require('url').URL;
+  try {
+    if (!global.DOMMatrix) {
+      global.DOMMatrix = class DOMMatrix {
+        a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
+        m11 = 1; m12 = 0; m13 = 0; m14 = 0;
+        m21 = 0; m22 = 1; m23 = 0; m24 = 0;
+        m31 = 0; m32 = 0; m33 = 1; m34 = 0;
+        m41 = 0; m42 = 0; m43 = 0; m44 = 1;
+        is2D = true; isIdentity = true;
+        
+        constructor() {}
+        translateSelf() { return this; }
+        scaleSelf() { return this; }
+        rotateSelf() { return this; }
+        skewXSelf() { return this; }
+        skewYSelf() { return this; }
+      };
+    }
+    
+    if (!global.DOMPoint) {
+      global.DOMPoint = class DOMPoint {
+        x = 0; y = 0; z = 0; w = 1;
+        constructor(x?: number, y?: number, z?: number, w?: number) {
+          if (x !== undefined) this.x = x;
+          if (y !== undefined) this.y = y;
+          if (z !== undefined) this.z = z;
+          if (w !== undefined) this.w = w;
+        }
+      };
+    }
+    
+    if (!global.URL) {
+      global.URL = require('url').URL;
+    }
+    
+    console.log('Polyfills initialized successfully');
+  } catch (error) {
+    console.error('Error initializing polyfills:', error);
   }
 }
 
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
+// Initialize polyfills
+initializePolyfills();
 
-if (typeof process !== 'undefined' && process.versions?.node) {
-  GlobalWorkerOptions.workerSrc = 'pdfjs-dist/legacy/build/pdf.worker.js';
+// Import PDF.js after polyfills
+let getDocument: any, GlobalWorkerOptions: any;
+
+try {
+  const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
+  getDocument = pdfjs.getDocument;
+  GlobalWorkerOptions = pdfjs.GlobalWorkerOptions;
+  
+  if (typeof process !== 'undefined' && process.versions?.node) {
+    GlobalWorkerOptions.workerSrc = 'pdfjs-dist/legacy/build/pdf.worker.js';
+  }
+  console.log('PDF.js loaded successfully');
+} catch (error) {
+  console.error('Error loading PDF.js:', error);
 }
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
+  if (!getDocument) {
+    throw new Error('PDF.js not loaded properly');
+  }
+  
   try {
     const typedArray = new Uint8Array(fileBuffer);
     const loadingTask = getDocument({ data: typedArray });
@@ -68,6 +93,8 @@ async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
 
 export async function POST(request: Request) {
   try {
+    console.log('API route called');
+    
     const formData = await request.formData();
     const pdfFile = formData.get('pdfFile') as File | null;
     
@@ -88,12 +115,15 @@ export async function POST(request: Request) {
     const anthropic = new Anthropic({ apiKey });
     const fileBuffer = await pdfFile.arrayBuffer();
     
+    console.log('Starting PDF extraction...');
+    
     let pdfTextContent = '';
     try {
       pdfTextContent = await extractTextFromPdf(fileBuffer);
+      console.log('PDF extraction successful, length:', pdfTextContent.length);
     } catch (parseError: any) {
       console.error('Error parsing PDF:', parseError);
-      return NextResponse.json({ error: 'Failed to parse the PDF file.' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to parse the PDF file: ' + parseError.message }, { status: 500 });
     }
     
     if (!pdfTextContent.trim()) {
@@ -105,6 +135,8 @@ export async function POST(request: Request) {
     if (pdfTextContent.length > maxLength) {
       trimmedContent = pdfTextContent.substring(0, maxLength);
     }
+
+    console.log('Sending to Claude API...');
 
     const systemPrompt = `You are an expert legal contract analyst. Analyze the provided contract and create a comprehensive, professional summary using the following standardized format. Use proper markdown formatting with bold headings and clear structure.
 
@@ -167,6 +199,8 @@ ${trimmedContent}
       max_tokens: 4096,
       messages: [{ role: 'user', content: [{ type: 'text', text: userMessage }] }],
     });
+    
+    console.log('Claude API response received');
     
     if (msg.content && msg.content.length > 0 && msg.content[0].type === 'text') {
       return NextResponse.json({ summary: msg.content[0].text });
