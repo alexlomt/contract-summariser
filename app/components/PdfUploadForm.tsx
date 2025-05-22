@@ -112,7 +112,7 @@ export default function PdfUploadForm() {
 
   const summaryHtml = useMemo(() => {
     if (summaryMarkdown) {
-      return marked.parse(summaryMarkdown, { gfm: true, breaks: true, sanitize: false });
+      return marked.parse(summaryMarkdown, { gfm: true, breaks: true });
     }
     return '';
   }, [summaryMarkdown]);
