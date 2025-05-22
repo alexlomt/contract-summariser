@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Move serverComponentsExternalPackages to top level
-  serverExternalPackages: ['pdfjs-dist', 'canvas'],
+  serverExternalPackages: ['canvas'],
   
   webpack: (config, { isServer }) => {
     if (isServer) {
