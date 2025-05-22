@@ -37,20 +37,25 @@ if (typeof global !== 'undefined') {
 
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
 
-// DISABLE worker for server-side processing
-GlobalWorkerOptions.workerSrc = '';
+// Completely disable worker
+GlobalWorkerOptions.workerSrc = false as any;
 GlobalWorkerOptions.workerPort = null;
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
   try {
     const typedArray = new Uint8Array(fileBuffer);
     
-    // Configure getDocument to not use worker
+    // Configure getDocument with all worker-disabling options
     const loadingTask = getDocument({
       data: typedArray,
       useWorkerFetch: false,
       isEvalSupported: false,
       useSystemFonts: true,
+      disableAutoFetch: true,
+      disableStream: true,
+      disableRange: true,
+      // Force disable worker
+      worker: null,
     });
     
     const pdfDocument = await loadingTask.promise;
@@ -61,7 +66,13 @@ async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
       const textContent = await page.getTextContent();
       const pageText = textContent.items.map((item: any) => item.str).join(' ');
       fullText = fullText + pageText + '\n';
-      page.cleanup();
+      
+      // Clean up page resources
+      try {
+        page.cleanup();
+      } catch (cleanupError) {
+        // Ignore cleanup errors
+      }
     }
     
     return fullText;
@@ -96,6 +107,7 @@ export async function POST(request: Request) {
     let pdfTextContent = '';
     try {
       pdfTextContent = await extractTextFromPdf(fileBuffer);
+      console.log('PDF processing successful, extracted', pdfTextContent.length, 'characters');
     } catch (parseError: any) {
       console.error('Error parsing PDF:', parseError);
       return NextResponse.json({ error: 'Failed to parse the PDF file.' }, { status: 500 });
