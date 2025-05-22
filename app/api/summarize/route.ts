@@ -24,7 +24,6 @@ if (typeof global !== 'undefined') {
   }
   
   if (!global.DOMPoint) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     global.DOMPoint = class {
       x = 0; y = 0; z = 0; w = 1;
       constructor() {
