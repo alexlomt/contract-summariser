@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import pdf from 'pdf-parse';
+// import pdf from 'pdf-parse'; // Removed static import
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
   try {
+    const pdf = (await import('pdf-parse')).default; // Dynamically import pdf-parse
     const buffer = Buffer.from(fileBuffer);
     const data = await pdf(buffer);
     return data.text;
