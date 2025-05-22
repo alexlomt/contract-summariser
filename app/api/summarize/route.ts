@@ -47,8 +47,8 @@ interface PdfTextItem {
   // Add other properties if needed, e.g., dir, width, height, transform, fontName
 }
 
-// Point to the worker script in the public folder
-GlobalWorkerOptions.workerSrc = `/pdf.worker.js`;
+// Point to the worker script in node_modules for Node.js environment
+GlobalWorkerOptions.workerSrc = `pdfjs-dist/legacy/build/pdf.worker.js`;
 // GlobalWorkerOptions.workerPort = null; // This might not be needed if workerSrc is set correctly
 
 async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
