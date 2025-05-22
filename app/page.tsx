@@ -1,3 +1,4 @@
+"use client";
 import PdfUploadForm from "@/app/components/PdfUploadForm";
 
 export default function Home() {
