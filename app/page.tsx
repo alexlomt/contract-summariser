@@ -18,11 +18,13 @@ export default function Home() {
           </span>
         </h1>
         
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          Select a PDF document you would like to analyse, and click &quot;Generate Summary&quot;. Please note this is an initial test version. Currently, the platform is limited to files no larger than 4MB.
+        <p className="text-xl text-gray-300 max-w-md mx-auto leading-relaxed">
+          Select a PDF document you would like to analyse, and click &quot;Generate Summary&quot;. 
+          
+          <br>Please note this is an initial test version. Currently, the platform is limited to files no larger than 4MB.</br>
 
           
-          For any issues and to report any errors please contact Alex from the M&A team. 
+          <br>For any issues and to report any errors please contact Aleks from the M&A team. </br>
         </p>
       </div>
 
