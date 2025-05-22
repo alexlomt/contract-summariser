@@ -32,6 +32,7 @@ if (typeof global !== 'undefined') {
   }
   
   if (!global.URL) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     global.URL = NodeURL as any; // Suppress TS error for now
   }
 }
