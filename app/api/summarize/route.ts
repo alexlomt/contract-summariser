@@ -48,6 +48,7 @@ interface PdfTextItem {
 }
 
 // Completely disable worker for Node.js environment
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 GlobalWorkerOptions.workerSrc = false as any; // Tell pdfjs-dist not to load a worker
 // GlobalWorkerOptions.workerPort = null; // Ensure worker port is null
 
