@@ -38,6 +38,12 @@ if (typeof global !== 'undefined') {
 
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
 
+// Define a simple interface for TextItem as it's not directly exported
+interface PdfTextItem {
+  str: string;
+  // Add other properties if needed, e.g., dir, width, height, transform, fontName
+}
+
 // Point to the worker script in node_modules for Node.js environment
 GlobalWorkerOptions.workerSrc = `pdfjs-dist/legacy/build/pdf.worker.js`;
 // GlobalWorkerOptions.workerPort = null; // This might not be needed if workerSrc is set correctly
@@ -64,12 +70,13 @@ async function extractTextFromPdf(fileBuffer: ArrayBuffer): Promise<string> {
     for (let i = 1; i <= pdfDocument.numPages; i++) {
       const page = await pdfDocument.getPage(i);
       const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item: any) => item.str).join(' ');
+      const pageText = textContent.items.map((item) => (item as PdfTextItem).str).join(' ');
       fullText = fullText + pageText + '\n';
       
       // Clean up page resources
       try {
         page.cleanup();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (cleanupError) {
         // Ignore cleanup errors
       }
@@ -108,7 +115,8 @@ export async function POST(request: Request) {
     try {
       pdfTextContent = await extractTextFromPdf(fileBuffer);
       console.log('PDF processing successful, extracted', pdfTextContent.length, 'characters');
-    } catch (parseError: any) {
+    } catch (parseErrorUnknown: unknown) {
+      const parseError = parseErrorUnknown as Error;
       console.error('Error parsing PDF:', parseError);
       return NextResponse.json({ error: 'Failed to parse the PDF file.' }, { status: 500 });
     }
@@ -185,13 +193,14 @@ ${trimmedContent}
     } else {
       return NextResponse.json({ error: 'Failed to get summary from AI.' }, { status: 500 });
     }
-  } catch (error: any) {
+  } catch (errorUnknown: unknown) {
+    const error = errorUnknown as Error;
     console.error('Error in /api/summarize:', error);
     let errorMessage = 'An unexpected error occurred.';
     
-    if (error instanceof Anthropic.APIError) {
-      errorMessage = `Anthropic API Error: ${error.message}`;
-    } else if (error.message) {
+    if (errorUnknown instanceof Anthropic.APIError) {
+      errorMessage = `Anthropic API Error: ${errorUnknown.message}`; // Direct access after instanceof check
+    } else if (error.message) { // error here is already asserted as Error
       errorMessage = error.message;
     }
     

@@ -19,7 +19,7 @@ export default function Home() {
         </h1>
         
         <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-          Select a PDF document you would like to analyse, and click "Generate Summary". Please note this is an initial test version. Currently, the platform is limited to files no larger than 4MB.
+          Select a PDF document you would like to analyse, and click &quot;Generate Summary&quot;. Please note this is an initial test version. Currently, the platform is limited to files no larger than 4MB.
 
           
           For any issues and to report any errors please contact Alex from the M&A team. 
